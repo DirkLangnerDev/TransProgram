@@ -13,6 +13,8 @@ import pystray
 from PIL import Image
 import io
 from pathlib import Path
+import subprocess
+import sys
 
 class VoiceMemoRecorder:
     def __init__(self):
@@ -27,6 +29,9 @@ class VoiceMemoRecorder:
         
         self.p = pyaudio.PyAudio()
         
+        # Überprüfe, ob FFmpeg verfügbar ist
+        self.check_ffmpeg()
+        
         # Lade Modell und nutze GPU wenn verfügbar
         import torch
         self.model = whisper.load_model("turbo")
@@ -39,11 +44,43 @@ class VoiceMemoRecorder:
         # Erstelle ein einfaches Icon für den Systray
         self.create_icon()
         
+    def check_ffmpeg(self):
+        """Überprüft, ob FFmpeg verfügbar ist und gibt Hinweise, wenn nicht."""
+        try:
+            # Versuche, FFmpeg zu finden
+            subprocess.run(
+                ["ffmpeg", "-version"], 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.PIPE, 
+                check=True
+            )
+            print("FFmpeg gefunden")
+        except (subprocess.SubprocessError, FileNotFoundError):
+            print("FEHLER: FFmpeg nicht gefunden!")
+            print("Bitte installieren Sie FFmpeg und stellen Sie sicher, dass es im PATH ist.")
+            print("Download: https://ffmpeg.org/download.html")
+            print("Oder installieren Sie es mit: choco install ffmpeg (wenn Chocolatey installiert ist)")
+            print("Nach der Installation starten Sie das Programm neu.")
+            
+            # Zeige Meldung und beende das Programm
+            import tkinter as tk
+            from tkinter import messagebox
+            root = tk.Tk()
+            root.withdraw()
+            messagebox.showerror(
+                "FFmpeg nicht gefunden", 
+                "FFmpeg wird für die Audioverarbeitung benötigt, wurde aber nicht gefunden.\n\n"
+                "Bitte installieren Sie FFmpeg und stellen Sie sicher, dass es im PATH ist.\n"
+                "Download: https://ffmpeg.org/download.html\n\n"
+                "Nach der Installation starten Sie das Programm neu."
+            )
+            sys.exit(1)
+    
     def create_icon(self):
         # Erstelle ein einfaches rotes Quadrat als Icon
         width = 64
         height = 64
-        image = Image.new('RGB', (width, height), color='red')
+        image = Image.new('RGB', (width, height), color='green')
         self.icon = pystray.Icon(
             "voice_memo",
             image,
@@ -67,7 +104,7 @@ class VoiceMemoRecorder:
         )
         
         # Ändere Icon-Farbe zu grün während der Aufnahme
-        self.update_icon_color('green')
+        self.update_icon_color('red')
         
         # Signalton für Start der Aufnahme (700 Hz für 100ms - sanfter, höherer Ton)
         winsound.Beep(700, 100)
