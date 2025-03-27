@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Memo Logbuch</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <header class="d-flex justify-content-between align-items-center py-3 mb-4 border-bottom">
+            <h1 class="h2">Voice Memo Logbuch</h1>
+            <div class="d-flex align-items-center">
+                <a href="/test" class="btn btn-outline-primary me-3">
+                    <i class="bi bi-gear"></i> Test-Umgebung
+                </a>
+                <div class="theme-toggle me-3">
+                    <button id="theme-toggle-btn" class="btn btn-sm">
+                        <i class="bi bi-moon-fill dark-icon"></i>
+                        <i class="bi bi-sun-fill light-icon"></i>
+                    </button>
+                </div>
+                <div class="stats-badge">
+                    <span id="total-messages" class="badge bg-primary">0 Memos</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- New Message Form -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Neues Memo erstellen</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="new-message-form" class="new-message-form">
+                            <div class="datetime-controls">
+                                <div class="form-group">
+                                    <label for="new-message-date">Datum</label>
+                                    <input type="date" id="new-message-date" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-message-time">Zeit</label>
+                                    <input type="time" id="new-message-time" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="new-message-text">Memo-Text</label>
+                                <textarea id="new-message-text" class="form-control message-textarea" placeholder="Geben Sie hier Ihren Memo-Text ein..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Memo speichern
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Aufgezeichnete Memos</h5>
+                        <div class="date-range-filter">
+                            <button id="refresh-btn" class="btn btn-sm btn-outline-secondary me-2">
+                                <i class="bi bi-arrow-clockwise"></i> Aktualisieren
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="messages-container" class="calendar-list">
+                            <div class="text-center py-5 text-muted">
+                                <div class="spinner-border mb-3" role="status">
+                                    <span class="visually-hidden">Lädt...</span>
+                                </div>
+                                <p>Lade Memos...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="py-3 my-4 border-top">
+            <p class="text-center text-muted">© 2025 Voice Memo Logbuch</p>
+        </footer>
+    </div>
+
+    <!-- Templates for dynamic content -->
+    <template id="date-group-template">
+        <div class="date-group mb-4">
+            <h3 class="date-header"></h3>
+            <div class="message-list"></div>
+        </div>
+    </template>
+
+    <template id="message-template">
+        <div class="message-card card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-top mb-2">
+                    <h5 class="message-time card-subtitle text-muted"></h5>
+                    <span class="message-id badge bg-secondary"></span>
+                </div>
+                <p class="message-text card-text"></p>
+                
+                <!-- Entity container -->
+                <div class="entity-container mb-2"></div>
+                
+                <!-- Edit controls -->
+                <div class="message-actions">
+                    <button class="edit-message-btn btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Bearbeiten
+                    </button>
+                    <button class="extract-entities-btn btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-tags"></i> Entitäten extrahieren
+                    </button>
+                </div>
+                
+                <div class="edit-controls">
+                    <div class="datetime-controls">
+                        <div class="form-group">
+                            <label>Datum</label>
+                            <input type="date" class="edit-date form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Zeit</label>
+                            <input type="time" class="edit-time form-control">
+                        </div>
+                    </div>
+                    <textarea class="message-textarea edit-transcript"></textarea>
+                    <div class="d-flex gap-2">
+                        <button class="save-edit-btn btn btn-sm btn-success">
+                            <i class="bi bi-check-lg"></i> Speichern
+                        </button>
+                        <button class="cancel-edit-btn btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-x-lg"></i> Abbrechen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="empty-state-template">
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-mic-mute display-1"></i>
+            <p class="mt-3">Keine Memos gefunden. Drücke Strg+Alt+R, um ein neues Memo aufzunehmen.</p>
+        </div>
+    </template>
+
+    <template id="entity-template">
+        <span class="entity-badge">
+            <span class="entity-label"></span>
+            <button class="entity-edit-btn" title="Entität bearbeiten">
+                <i class="bi bi-pencil-fill"></i>
+            </button>
+        </span>
+    </template>
+
+    <!-- Entity Edit Modal -->
+    <div class="modal fade" id="entityEditModal" tabindex="-1" aria-labelledby="entityEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="entityEditModalLabel">Entität bearbeiten</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="entity-edit-form">
+                        <input type="hidden" id="entity-id">
+                        <div class="mb-3">
+                            <label for="entity-type" class="form-label">Typ</label>
+                            <select id="entity-type" class="form-select">
+                                <option value="person">Person</option>
+                                <option value="project">Projekt</option>
+                                <option value="company">Unternehmen</option>
+                                <option value="topic">Thema</option>
+                                <option value="location">Ort</option>
+                                <option value="date">Datum</option>
+                                <option value="other">Sonstiges</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entity-label" class="form-label">Bezeichnung</label>
+                            <input type="text" class="form-control" id="entity-label" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entity-color" class="form-label">Farbe</label>
+                            <input type="color" class="form-control form-control-color" id="entity-color" value="#FF5733">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="button" class="btn btn-primary" id="save-entity-btn">Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entity Merge Modal -->
+    <div class="modal fade" id="entityMergeModal" tabindex="-1" aria-labelledby="entityMergeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="entityMergeModalLabel">Entitäten zusammenführen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Wählen Sie die zu zusammenführenden Entitäten aus:</p>
+                    <div id="merge-entities-list" class="mb-3">
+                        <!-- Entities will be dynamically added here -->
+                    </div>
+                    <hr>
+                    <h6>Zusammengeführte Entität:</h6>
+                    <form id="merged-entity-form">
+                        <div class="mb-3">
+                            <label for="merged-entity-type" class="form-label">Typ</label>
+                            <select id="merged-entity-type" class="form-select">
+                                <option value="person">Person</option>
+                                <option value="project">Projekt</option>
+                                <option value="company">Unternehmen</option>
+                                <option value="topic">Thema</option>
+                                <option value="location">Ort</option>
+                                <option value="date">Datum</option>
+                                <option value="other">Sonstiges</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="merged-entity-label" class="form-label">Bezeichnung</label>
+                            <input type="text" class="form-control" id="merged-entity-label" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="merged-entity-color" class="form-label">Farbe</label>
+                            <input type="color" class="form-control form-control-color" id="merged-entity-color" value="#FF5733">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="button" class="btn btn-primary" id="merge-entities-btn">Zusammenführen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

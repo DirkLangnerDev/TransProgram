@@ -1,0 +1,262 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --card-bg-color: #ffffff;
+    --text-color: #212529;
+    --border-color: #dee2e6;
+    --muted-color: #6c757d;
+    --hover-bg: #f1f3f5;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --primary-color: #0d6efd;
+    --secondary-color: #adb5bd;
+    --background-color: #212529;
+    --card-bg-color: #343a40;
+    --text-color: #f8f9fa;
+    --border-color: #495057;
+    --muted-color: #d1d5db; /* Lightened muted color for better readability */
+    --hover-bg: #2b3035;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-fluid {
+    max-width: 1200px;
+    flex: 1;
+}
+
+/* Header and Footer */
+header, footer {
+    border-color: var(--border-color) !important;
+}
+
+/* Cards */
+.card {
+    background-color: var(--card-bg-color);
+    border-color: var(--border-color);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: all 0.3s ease;
+}
+
+.card-header {
+    background-color: var(--card-bg-color);
+    border-bottom-color: var(--border-color);
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+/* Theme Toggle */
+.theme-toggle .btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle .btn:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Show/hide icons based on theme */
+body:not([data-theme="dark"]) .dark-icon {
+    display: inline-block;
+}
+
+body:not([data-theme="dark"]) .light-icon {
+    display: none;
+}
+
+body[data-theme="dark"] .dark-icon {
+    display: none;
+}
+
+body[data-theme="dark"] .light-icon {
+    display: inline-block;
+}
+
+/* Calendar List View */
+.calendar-list {
+    padding: 0.5rem;
+}
+
+.date-header {
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--primary-color);
+    color: var(--text-color);
+    font-size: 1.5rem;
+}
+
+.message-card {
+    transition: transform 0.2s ease;
+}
+
+.message-card:hover {
+    transform: translateY(-2px);
+}
+
+.message-time {
+    font-size: 0.9rem;
+    color: var(--muted-color);
+}
+
+.message-id {
+    font-size: 0.8rem;
+    background-color: var(--secondary-color);
+}
+
+.message-text {
+    white-space: pre-line;
+    margin-bottom: 0;
+    color: var(--text-color); /* Ensure message text uses the main text color */
+}
+
+/* Editing controls */
+.message-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.edit-controls {
+    display: none; /* Hidden by default, shown when editing */
+    margin-top: 0.5rem;
+}
+
+.message-textarea {
+    width: 100%;
+    min-height: 80px;
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* New message form */
+.new-message-form {
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.datetime-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.datetime-controls input {
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+
+.datetime-controls input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Badges */
+.badge {
+    padding: 0.5em 0.75em;
+}
+
+/* Entity badges */
+.entity-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.entity-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    color: white;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.entity-badge:hover {
+    filter: brightness(1.1);
+}
+
+.entity-label {
+    margin-right: 0.25rem;
+}
+
+.entity-edit-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.7rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.entity-edit-btn:hover {
+    color: white;
+}
+
+/* Entity type colors are defined in the LLMClient class */
+
+/* Buttons */
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--hover-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* Empty state */
+.empty-state {
+    color: var(--muted-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .date-header {
+        font-size: 1.25rem;
+    }
+    
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

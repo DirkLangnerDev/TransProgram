@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entitäten-Extraktion Testumgebung</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <header class="d-flex justify-content-between align-items-center py-3 mb-4 border-bottom">
+            <h1 class="h2">Entitäten-Extraktion Testumgebung</h1>
+            <div class="d-flex align-items-center">
+                <a href="/" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left"></i> Zurück
+                </a>
+                <div class="theme-toggle me-3">
+                    <button id="theme-toggle-btn" class="btn btn-sm">
+                        <i class="bi bi-moon-fill dark-icon"></i>
+                        <i class="bi bi-sun-fill light-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Test-Konfiguration</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="test-form">
+                            <div class="mb-3">
+                                <label for="model-select" class="form-label">LLM-Modell auswählen</label>
+                                <select id="model-select" class="form-select">
+                                    <option value="ollama" selected>Ollama ({{ llm_config.ollama.model }})</option>
+                                    <option value="openai">OpenAI ({{ llm_config.openai.model }})</option>
+                                    <option value="anthropic">Anthropic ({{ llm_config.anthropic.model }})</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="test-note" class="form-label">Beispiel-Notiz</label>
+                                <textarea id="test-note" class="form-control message-textarea" rows="5" placeholder="Geben Sie hier Ihren Test-Text ein...">Gestern hatte ich ein Meeting mit Sarah von der Marketing-Abteilung bei Acme Corp. Wir haben über das neue Produkt-Launch für Q3 2025 gesprochen. Das Projekt "Phoenix" soll in Berlin vorgestellt werden. Wir müssen bis zum 15. Juli die Präsentation fertigstellen.</textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="extraction-prompt" class="form-label">Extraktions-Prompt</label>
+                                <p class="text-muted small">Verwenden Sie {text} als Platzhalter für den zu analysierenden Text oder behalten Sie die Zeile "Text to analyze:" bei.</p>
+                                <textarea id="extraction-prompt" class="form-control message-textarea" rows="10">{{ extraction_prompt }}</textarea>
+                            </div>
+                            
+                            <button type="submit" id="run-extraction-btn" class="btn btn-primary">
+                                <i class="bi bi-play-fill"></i> Extraktion starten
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Extraktionsergebnisse</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="results-container">
+                            <div class="text-center py-5 text-muted">
+                                <p>Noch keine Ergebnisse. Starten Sie die Extraktion, um Ergebnisse zu sehen.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="py-3 my-4 border-top">
+            <p class="text-center text-muted">© 2025 Voice Memo Logbuch - Testumgebung</p>
+        </footer>
+    </div>
+
+    <!-- Template for entity display -->
+    <template id="entity-template">
+        <span class="entity-badge">
+            <span class="entity-label"></span>
+        </span>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/test.js') }}"></script>
+</body>
+</html>

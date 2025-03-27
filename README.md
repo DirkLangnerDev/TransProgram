@@ -1,4 +1,99 @@
-# Voice Memo Recorder
+# Voice Memo Transcription System
+
+Ein System zur Aufnahme, Transkription und Verwaltung von Sprachnotizen mit einer Weboberfläche zur Anzeige und Analyse der Transkripte.
+
+## Funktionen
+
+### Sprachaufnahme und Transkription (trans.pyw)
+- Aufnahme von Sprachnotizen über Hotkey (Strg+Alt+R)
+- Automatische Transkription mit OpenAI Whisper (Deutsch)
+- Speicherung der Transkripte in einer lokalen SQLite-Datenbank
+- Kopieren der Transkripte in die Zwischenablage
+- Systray-Icon für einfachen Zugriff
+
+### Weboberfläche (app.py)
+- Kalenderansicht aller aufgezeichneten Memos
+- Umschaltbare Hell-/Dunkel-Modus
+- Responsive Design für verschiedene Geräte
+- Statistiken über aufgezeichnete Memos
+
+## Installation
+
+1. Stellen Sie sicher, dass Python 3.8+ installiert ist
+2. Installieren Sie FFmpeg (wird für die Audioverarbeitung benötigt)
+3. Klonen Sie dieses Repository
+4. Installieren Sie die Abhängigkeiten:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Verwendung
+
+### Sprachaufnahme starten
+
+Führen Sie die Datei `trans.pyw` aus, um das Aufnahmeprogramm zu starten:
+
+```bash
+pythonw trans.pyw
+```
+
+- Drücken Sie `Strg+Alt+R`, um die Aufnahme zu starten/stoppen
+- Nach dem Stoppen wird die Aufnahme automatisch transkribiert und in der Datenbank gespeichert
+- Die Transkription wird automatisch in die Zwischenablage kopiert
+
+### Weboberfläche starten
+
+Führen Sie die Datei `app.py` aus, um die Weboberfläche zu starten:
+
+```bash
+python app.py
+```
+
+Öffnen Sie dann einen Browser und navigieren Sie zu `http://localhost:5000`
+
+## Verwendung der Entitätsextraktion
+
+### Automatische Extraktion
+- Beim Speichern eines neuen Memos werden automatisch Entitäten extrahiert
+- Die extrahierten Entitäten werden als farbige Badges unter dem Memo-Text angezeigt
+- Entitäten werden nach Typ farbcodiert (Personen, Projekte, Unternehmen, Themen, Orte, Daten)
+
+### Manuelle Extraktion
+- Klicken Sie auf den "Entitäten extrahieren" Button bei einem bestehenden Memo, um die Extraktion manuell auszulösen
+- Dies ist nützlich für ältere Memos oder wenn Sie die Extraktion erneut durchführen möchten
+
+### Bearbeitung von Entitäten
+- Klicken Sie auf das Stift-Symbol in einem Entitäts-Badge, um die Entität zu bearbeiten
+- Sie können den Typ, die Bezeichnung und die Farbe der Entität ändern
+- Änderungen an einer Entität wirken sich auf alle Memos aus, die diese Entität verwenden
+
+### Zusammenführen von Entitäten
+- Wenn die gleiche Entität in verschiedenen Formen auftaucht (z.B. "Max" und "Max Mustermann"), können Sie diese zusammenführen
+- Verwenden Sie die Zusammenführungsfunktion, um mehrere Entitäten zu einer zu kombinieren
+- Wählen Sie die zu zusammenführenden Entitäten aus und geben Sie die Eigenschaften der zusammengeführten Entität an
+
+### LLM-Konfiguration
+- Die Entitätsextraktion verwendet standardmäßig das lokale Ollama LLM
+- Sie können die Konfiguration in der `config.json` Datei ändern, um andere LLMs zu verwenden:
+  - Lokales Ollama (Standard)
+  - OpenAI (erfordert API-Schlüssel)
+  - Anthropic (erfordert API-Schlüssel)
+
+## Funktionen (Neu)
+
+### Entitätsextraktion und -verwaltung
+- Automatische Extraktion von Entitäten (Personen, Projekte, Unternehmen, Themen, Orte, Daten) aus Memos
+- Farbcodierte Darstellung von Entitäten als Badges
+- Bearbeitung und Zusammenführung von Entitäten
+- Unterstützung für lokale LLMs (Ollama) und Cloud-basierte LLMs (OpenAI, Anthropic)
+- Konfigurierbare LLM-Einstellungen
+
+## Geplante Funktionen
+
+- Zusammenfassungen von Nachrichten
+- Volltext- und semantische Suche
+- Visualisierung von Entitätsbeziehungen
 
 Voice Memo Recorder is a Windows-based Python utility designed for personal voice memo capture and transcription. Using a single hotkey, it records your voice, transcribes the recording into German text via OpenAI’s Whisper “turbo” model, and then copies the transcription to your clipboard. The application provides both audible signals and a visual status indicator in the system tray.
 
@@ -117,5 +212,3 @@ Please follow the established coding standards and ensure thorough testing of yo
 This project is licensed under the MIT License.
 
 ---
-
-Voice Memo Recorder provides a streamlined approach to capturing and transcribing voice memos in German. Its intuitive hotkey control, real-time feedback, and clipboard integration make it an ideal tool for efficient voice-to-text conversion on Windows.

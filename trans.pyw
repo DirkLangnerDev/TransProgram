@@ -15,6 +15,8 @@ import io
 from pathlib import Path
 import subprocess
 import sys
+import sqlite3
+import datetime
 
 class VoiceMemoRecorder:
     def __init__(self):
@@ -41,9 +43,55 @@ class VoiceMemoRecorder:
         else:
             print("CPU wird verwendet")
             
+        # Initialisiere die Datenbank
+        self.init_db()
+            
         # Erstelle ein einfaches Icon für den Systray
         self.create_icon()
         
+    def init_db(self):
+        """Initialisiert die SQLite-Datenbank für die Transkript-Protokollierung."""
+        # Erstelle den Datenbankordner, falls er nicht existiert
+        self.db_path = Path("transcripts.db")
+        
+        # Verbinde zur Datenbank (wird erstellt, falls nicht vorhanden) und erstelle die Tabelle
+        # Wir erstellen hier nur die Tabelle, aber verwenden keine dauerhafte Verbindung
+        # um Thread-Probleme zu vermeiden
+        conn = sqlite3.connect(str(self.db_path))
+        cursor = conn.cursor()
+        
+        # Erstelle die Tabelle, falls sie nicht existiert
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT NOT NULL,
+            transcript TEXT NOT NULL
+        )
+        ''')
+        conn.commit()
+        conn.close()
+        print(f"Datenbank initialisiert: {self.db_path}")
+        
+    def log_message(self, transcript):
+        """Speichert ein transkribiertes Memo in der Datenbank."""
+        # Erstelle für jede Operation eine neue Verbindung, um Thread-Sicherheit zu gewährleisten
+        try:
+            timestamp = datetime.datetime.now().isoformat()
+            
+            # Neue Verbindung für diese Operation
+            conn = sqlite3.connect(str(self.db_path))
+            cursor = conn.cursor()
+            
+            cursor.execute(
+                "INSERT INTO messages (timestamp, transcript) VALUES (?, ?)",
+                (timestamp, transcript)
+            )
+            conn.commit()
+            conn.close()
+            print(f"Memo gespeichert: {timestamp[:19]}")
+        except Exception as e:
+            print(f"Fehler beim Speichern des Memos: {e}")
+    
     def check_ffmpeg(self):
         """Überprüft, ob FFmpeg verfügbar ist und gibt Hinweise, wenn nicht."""
         try:
@@ -145,6 +193,9 @@ class VoiceMemoRecorder:
         # Transkribiere mit Whisper (Deutsch)
         result = self.model.transcribe(temp_filename, language="de")
         transcript = result["text"]
+        
+        # Speichere in der Datenbank
+        self.log_message(transcript)
         
         # Kopiere in die Zwischenablage
         pyperclip.copy(transcript)

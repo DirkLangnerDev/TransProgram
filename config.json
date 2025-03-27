@@ -1,0 +1,17 @@
+{
+  "llm": {
+    "provider": "ollama",
+    "ollama": {
+      "base_url": "http://localhost:11434",
+      "model": "gemma3:12b"
+    },
+    "openai": {
+      "api_key": "",
+      "model": "gpt-4o"
+    },
+    "anthropic": {
+      "api_key": "",
+      "model": "claude-3-opus-20240229"
+    }
+  }
+}
